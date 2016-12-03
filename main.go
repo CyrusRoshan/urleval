@@ -1,18 +1,30 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
 )
 
 func fileHandler(w http.ResponseWriter, r *http.Request) {
-	pageData := r.URL.Path[1:]
-	w.Write([]byte(pageData))
+	decodedString, err := base64.StdEncoding.DecodeString(r.URL.Path[1:])
+	if err != nil {
+		w.Write([]byte("Not a valid base64 string"))
+		return
+	}
+
+	w.Write(decodedString)
 }
 
 func scriptHandler(w http.ResponseWriter, r *http.Request) {
-	pageData := "<script>" + r.URL.Path[1:] + "</script>"
+	decodedString, err := base64.StdEncoding.DecodeString(r.URL.Path[1:])
+	if err != nil {
+		w.Write([]byte("Not a valid base64 string"))
+		return
+	}
+
+	pageData := "<script>" + string(decodedString) + "</script>"
 	w.Write([]byte(pageData))
 }
 
